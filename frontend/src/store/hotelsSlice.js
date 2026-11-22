@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import * as hotelsApi from "../api/hotelsApi";
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 5;
 
 export const loadHotels = createAsyncThunk("hotels/loadHotels", async function (_, thunkApi) {
   const state = thunkApi.getState().hotels;
@@ -10,6 +10,7 @@ export const loadHotels = createAsyncThunk("hotels/loadHotels", async function (
     title: state.searchTitle,
     minPrice: state.minPrice,
     maxPrice: state.maxPrice,
+    sort: state.sort,
     offset: (page - 1) * PAGE_SIZE,
     limit: PAGE_SIZE
   });
@@ -39,23 +40,27 @@ export const removeHotel = createAsyncThunk("hotels/removeHotel", async function
   }
 });
 
+const initialState = {
+  items: [],
+  total: 0,
+  page: 1,
+  limit: PAGE_SIZE,
+  searchTitle: "",
+  minPrice: "",
+  maxPrice: "",
+  sort: "newest",
+  minRating: 0,
+  current: null,
+  loading: false,
+  saving: false,
+  error: "",
+  formErrors: {},
+  successMessage: ""
+};
+
 const hotelsSlice = createSlice({
   name: "hotels",
-  initialState: {
-    items: [],
-    total: 0,
-    page: 1,
-    limit: PAGE_SIZE,
-    searchTitle: "",
-    minPrice: "",
-    maxPrice: "",
-    current: null,
-    loading: false,
-    saving: false,
-    error: "",
-    formErrors: {},
-    successMessage: ""
-  },
+  initialState,
   reducers: {
     setSearchTitle: function (state, action) {
       state.searchTitle = action.payload;
@@ -66,8 +71,22 @@ const hotelsSlice = createSlice({
     setMaxPrice: function (state, action) {
       state.maxPrice = action.payload;
     },
+    setSort: function (state, action) {
+      state.sort = action.payload;
+    },
+    setMinRating: function (state, action) {
+      state.minRating = action.payload;
+    },
     setPage: function (state, action) {
       state.page = action.payload;
+    },
+    resetFilters: function (state) {
+      state.searchTitle = "";
+      state.minPrice = "";
+      state.maxPrice = "";
+      state.sort = "newest";
+      state.minRating = 0;
+      state.page = 1;
     },
     clearSuccess: function (state) {
       state.successMessage = "";
@@ -94,7 +113,7 @@ const hotelsSlice = createSlice({
       })
       .addCase(loadHotels.rejected, function (state) {
         state.loading = false;
-        state.error = "Could not load hotels. Please try again.";
+        state.error = "Could not load hotels. Please check backend connection.";
       })
       .addCase(loadHotel.pending, function (state) {
         state.loading = true;
@@ -124,7 +143,7 @@ const hotelsSlice = createSlice({
         state.error = (action.payload && action.payload.message) || "Could not save hotel.";
       })
       .addCase(removeHotel.fulfilled, function (state, action) {
-        state.successMessage = action.payload.message;
+        state.successMessage = action.payload.message || "Hotel deleted successfully.";
         state.items = state.items.filter(function (hotel) {
           return hotel.id !== action.payload.id;
         });
@@ -140,7 +159,10 @@ export const {
   setSearchTitle,
   setMinPrice,
   setMaxPrice,
+  setSort,
+  setMinRating,
   setPage,
+  resetFilters,
   clearSuccess,
   clearFormErrors,
   resetCurrent

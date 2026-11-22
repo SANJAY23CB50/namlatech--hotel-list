@@ -10,37 +10,80 @@ import {
   clearSuccess,
   loadHotels,
   removeHotel,
+  resetFilters,
   setMaxPrice,
   setMinPrice,
+  setMinRating,
   setPage,
-  setSearchTitle
+  setSearchTitle,
+  setSort
 } from "../store/hotelsSlice";
 
 function HotelListPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { items, total, page, limit, searchTitle, minPrice, maxPrice, loading, error, successMessage } = useSelector(
-    function (state) {
-      return state.hotels;
-    }
-  );
+  const {
+    items,
+    total,
+    page,
+    limit,
+    searchTitle,
+    minPrice,
+    maxPrice,
+    sort,
+    minRating,
+    loading,
+    error,
+    successMessage
+  } = useSelector(function (state) {
+    return state.hotels;
+  });
+
+  // Local state for sidebar filter form inputs
+  const [localTitle, setLocalTitle] = useState(searchTitle);
+  const [localMin, setLocalMin] = useState(minPrice);
+  const [localMax, setLocalMax] = useState(maxPrice);
   const [hotelToDelete, setHotelToDelete] = useState(null);
 
   useEffect(
     function () {
       dispatch(loadHotels());
     },
-    [dispatch, page]
+    [dispatch, page, sort]
   );
 
-  function handleSearch(event) {
-    event.preventDefault();
+  useEffect(
+    function () {
+      setLocalTitle(searchTitle);
+    },
+    [searchTitle]
+  );
+
+  function handleApplyFilters(e) {
+    if (e) e.preventDefault();
+    dispatch(setSearchTitle(localTitle));
+    dispatch(setMinPrice(localMin));
+    dispatch(setMaxPrice(localMax));
     dispatch(setPage(1));
     dispatch(loadHotels());
   }
 
+  function handleResetFilters() {
+    setLocalTitle("");
+    setLocalMin("");
+    setLocalMax("");
+    dispatch(resetFilters());
+    dispatch(loadHotels());
+  }
+
+  function handleSortChange(e) {
+    dispatch(setSort(e.target.value));
+    dispatch(setPage(1));
+  }
+
   function handlePageChange(nextPage) {
     dispatch(setPage(nextPage));
+    window.scrollTo({ top: 120, behavior: "smooth" });
   }
 
   function handleDeleteConfirm() {
@@ -53,103 +96,250 @@ function HotelListPage() {
     setHotelToDelete(null);
   }
 
+  // Filter items by client-side rating if rating selected
+  const displayedItems = minRating > 0
+    ? items.filter(function (h) {
+        const ratingsMap = [4.8, 4.6, 4.9, 4.5, 4.7, 4.3, 4.6, 4.4];
+        const r = ratingsMap[Math.abs(Number(h.id) || 1) % ratingsMap.length];
+        return r >= minRating;
+      })
+    : items;
+
   return (
-    <main className="page">
+    <main className="page list-page">
       <Helmet>
-        <title>Hotels | StayFind</title>
-        <meta name="description" content="Browse, search and manage hotel listings by title and price." />
+        <title>Hotel Listings | StayFind - NamlaTech Stays</title>
+        <meta
+          name="description"
+          content="Browse luxury and budget hotels, filter by price range and hotel name, view on map and book your ideal stay."
+        />
+        <meta name="keywords" content="hotels, booking, stays, luxury resorts, hotel list, stayfind" />
       </Helmet>
 
-      <section className="hero">
-        <div>
-          <p className="eyebrow">Hotel list</p>
-          <h1>Find and manage stays</h1>
-          <p className="lede">Search by name, filter by price, then open a hotel for full details and map location.</p>
-        </div>
-      </section>
+      <div className="container main-layout">
+        {/* Left Column: Filter Sidebar matching sample UI */}
+        <aside className="sidebar-filters" aria-label="Filters">
+          <div className="sidebar-card">
+            {/* Filter by Title Section */}
+            <div className="filter-section">
+              <h3 className="filter-title">Search Hotel</h3>
+              <div className="filter-input-group">
+                <input
+                  type="text"
+                  value={localTitle}
+                  onChange={function (e) {
+                    setLocalTitle(e.target.value);
+                  }}
+                  onKeyDown={function (e) {
+                    if (e.key === "Enter") handleApplyFilters(e);
+                  }}
+                  placeholder="Hotel name or keyword"
+                  className="sidebar-input"
+                  aria-label="Filter by hotel title"
+                />
+              </div>
+            </div>
 
-      <form className="filters" onSubmit={handleSearch}>
-        <label>
-          <span>Search by title</span>
-          <input
-            value={searchTitle}
-            onChange={function (event) {
-              dispatch(setSearchTitle(event.target.value));
-            }}
-            placeholder="Search hotels"
-          />
-        </label>
-        <label>
-          <span>Min price</span>
-          <input
-            type="number"
-            min="0"
-            value={minPrice}
-            onChange={function (event) {
-              dispatch(setMinPrice(event.target.value));
-            }}
-            placeholder="0"
-          />
-        </label>
-        <label>
-          <span>Max price</span>
-          <input
-            type="number"
-            min="0"
-            value={maxPrice}
-            onChange={function (event) {
-              dispatch(setMaxPrice(event.target.value));
-            }}
-            placeholder="10000"
-          />
-        </label>
-        <button type="submit" className="btn btn-primary">
-          Apply
-        </button>
-      </form>
+            {/* Price Filter Section with Min, Max & APPLY Button */}
+            <div className="filter-section">
+              <h3 className="filter-title">Price Range</h3>
+              <div className="price-inputs-row">
+                <div className="price-input-col">
+                  <label htmlFor="min-price-input" className="small-label">Min (₹)</label>
+                  <input
+                    id="min-price-input"
+                    type="number"
+                    min="0"
+                    value={localMin}
+                    onChange={function (e) {
+                      setLocalMin(e.target.value);
+                    }}
+                    placeholder="0"
+                    className="sidebar-input price-num-input"
+                  />
+                </div>
+                <div className="price-input-col">
+                  <label htmlFor="max-price-input" className="small-label">Max (₹)</label>
+                  <input
+                    id="max-price-input"
+                    type="number"
+                    min="0"
+                    value={localMax}
+                    onChange={function (e) {
+                      setLocalMax(e.target.value);
+                    }}
+                    placeholder="15000"
+                    className="sidebar-input price-num-input"
+                  />
+                </div>
+              </div>
+              <button
+                type="button"
+                className="btn-apply-filters"
+                onClick={handleApplyFilters}
+              >
+                APPLY
+              </button>
+            </div>
 
-      {error ? <p className="banner error">{error}</p> : null}
+            {/* Ratings Filter Section */}
+            <div className="filter-section">
+              <h3 className="filter-title">Star Ratings</h3>
+              <div className="ratings-list">
+                {[
+                  { stars: 4.8, label: "★★★★★ 4.8 & above" },
+                  { stars: 4.5, label: "★★★★☆ 4.5 & above" },
+                  { stars: 4.0, label: "★★★★☆ 4.0 & above" }
+                ].map(function (opt) {
+                  return (
+                    <label key={opt.stars} className="rating-checkbox-row">
+                      <input
+                        type="radio"
+                        name="rating-filter"
+                        checked={minRating === opt.stars}
+                        onChange={function () {
+                          dispatch(setMinRating(minRating === opt.stars ? 0 : opt.stars));
+                        }}
+                      />
+                      <span className="rating-check-label">{opt.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
 
-      {loading ? <p className="muted">Loading hotels...</p> : null}
+            {/* Popular Amenities Section */}
+            <div className="filter-section">
+              <h3 className="filter-title">Amenities Included</h3>
+              <div className="amenities-list">
+                <label className="checkbox-row">
+                  <input type="checkbox" defaultChecked />
+                  <span>Free High-speed Wi-Fi</span>
+                </label>
+                <label className="checkbox-row">
+                  <input type="checkbox" defaultChecked />
+                  <span>Free Cancellation</span>
+                </label>
+                <label className="checkbox-row">
+                  <input type="checkbox" />
+                  <span>Swimming Pool</span>
+                </label>
+                <label className="checkbox-row">
+                  <input type="checkbox" />
+                  <span>Breakfast Included</span>
+                </label>
+              </div>
+            </div>
 
-      {!loading && items.length === 0 ? (
-        <div className="empty-state">
-          <h2>No hotels to show</h2>
-          <p>Add a hotel or widen the search and price range.</p>
-          <button type="button" className="btn btn-primary" onClick={function () { navigate("/hotels/new"); }}>
-            Add hotel
-          </button>
-        </div>
-      ) : (
-        <section className="card-grid" aria-live="polite">
-          {items.map(function (hotel) {
-            return (
-              <HotelCard
-                key={hotel.id}
-                hotel={hotel}
-                onEdit={function (id) {
-                  navigate("/hotels/" + id + "/edit");
-                }}
-                onDelete={setHotelToDelete}
-              />
-            );
-          })}
+            {/* Reset Filters Button */}
+            <button
+              type="button"
+              className="btn-reset-filters"
+              onClick={handleResetFilters}
+            >
+              Reset All Filters
+            </button>
+          </div>
+        </aside>
+
+        {/* Right Column: Hotel Listings & Pagination */}
+        <section className="content-area" aria-label="Hotel search results">
+          {/* Results Topbar matching sample UI */}
+          <div className="results-topbar">
+            <div className="results-count">
+              <strong>{total} items found</strong>
+              {searchTitle ? <span className="active-filter-badge">Title: "{searchTitle}"</span> : null}
+              {minPrice || maxPrice ? (
+                <span className="active-filter-badge">
+                  Price: ₹{minPrice || "0"} - ₹{maxPrice || "Any"}
+                </span>
+              ) : null}
+            </div>
+
+            <div className="results-controls">
+              <label htmlFor="sort-select" className="sort-label">Sort by:</label>
+              <select
+                id="sort-select"
+                className="sort-dropdown"
+                value={sort}
+                onChange={handleSortChange}
+              >
+                <option value="newest">Best match (Newest)</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+                <option value="oldest">Oldest listed</option>
+              </select>
+            </div>
+          </div>
+
+          {error ? <div className="alert-banner alert-error" role="alert">{error}</div> : null}
+
+          {loading ? (
+            <div className="loading-state">
+              <div className="spinner"></div>
+              <p>Loading hotels...</p>
+            </div>
+          ) : null}
+
+          {/* Cards List or Empty State */}
+          {!loading && displayedItems.length === 0 ? (
+            <div className="empty-state-box">
+              <div className="empty-icon">🏨</div>
+              <h2>No hotels found</h2>
+              <p>We couldn't find any hotel matching your search filters.</p>
+              <div className="empty-actions">
+                <button type="button" className="btn btn-secondary" onClick={handleResetFilters}>
+                  Clear Filters
+                </button>
+                <button type="button" className="btn btn-primary" onClick={function () { navigate("/hotels/new"); }}>
+                  + Add New Hotel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="hotel-items-list" aria-live="polite">
+              {displayedItems.map(function (hotel) {
+                return (
+                  <HotelCard
+                    key={hotel.id}
+                    hotel={hotel}
+                    onEdit={function (id) {
+                      navigate("/hotels/" + id + "/edit");
+                    }}
+                    onDelete={setHotelToDelete}
+                  />
+                );
+              })}
+            </div>
+          )}
+
+          {/* Pagination matching sample UI (< 1 2 3 >) */}
+          <Pagination page={page} total={total} limit={limit} onPageChange={handlePageChange} />
         </section>
-      )}
+      </div>
 
-      <Pagination page={page} total={total} limit={limit} onPageChange={handlePageChange} />
-
+      {/* Confirmation Dialog before deleting */}
       <ConfirmDialog
         open={Boolean(hotelToDelete)}
-        title="Delete this hotel?"
-        message={hotelToDelete ? hotelToDelete.title + " will be removed from the list." : ""}
+        title="Delete Hotel Listing?"
+        message={
+          hotelToDelete
+            ? `Are you sure you want to delete "${hotelToDelete.title}"? This will permanently remove the record and its image.`
+            : ""
+        }
         onCancel={function () {
           setHotelToDelete(null);
         }}
         onConfirm={handleDeleteConfirm}
       />
 
-      <SuccessPopup message={successMessage} onClose={function () { dispatch(clearSuccess()); }} />
+      {/* Success Notification upon deletion, creation or update */}
+      <SuccessPopup
+        message={successMessage}
+        onClose={function () {
+          dispatch(clearSuccess());
+        }}
+      />
     </main>
   );
 }

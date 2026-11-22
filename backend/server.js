@@ -31,6 +31,25 @@ app.use(function (err, _req, res, _next) {
   res.status(500).json({ message: "Something went wrong." });
 });
 
-app.listen(PORT, function () {
+const pool = require("./db");
+
+app.listen(PORT, async function () {
   console.log("Server running on http://localhost:" + PORT);
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS hotels (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(150) NOT NULL,
+        description TEXT NOT NULL,
+        latitude NUMERIC(10, 7) NOT NULL,
+        longitude NUMERIC(10, 7) NOT NULL,
+        price NUMERIC(12, 2) NOT NULL,
+        image_path VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log("PostgreSQL: hotels table verified.");
+  } catch (err) {
+    console.warn("PostgreSQL table init note:", err.message);
+  }
 });

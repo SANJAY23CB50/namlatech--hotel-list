@@ -1,7 +1,7 @@
 function Pagination({ page, total, limit, onPageChange }) {
   const pageCount = Math.max(1, Math.ceil(total / limit));
 
-  if (total === 0) {
+  if (total === 0 || pageCount <= 1) {
     return null;
   }
 
@@ -11,16 +11,25 @@ function Pagination({ page, total, limit, onPageChange }) {
   }
 
   return (
-    <nav className="pagination" aria-label="Hotel pages">
-      <button type="button" className="page-btn" disabled={page <= 1} onClick={function () { onPageChange(page - 1); }}>
-        Previous
+    <nav className="pagination-bar" aria-label="Hotel search pagination">
+      <button
+        type="button"
+        className="page-nav-btn"
+        disabled={page <= 1}
+        onClick={function () {
+          onPageChange(page - 1);
+        }}
+        aria-label="Previous page"
+      >
+        ‹
       </button>
+
       {pages.map(function (number) {
         return (
           <button
             type="button"
             key={number}
-            className={number === page ? "page-btn active" : "page-btn"}
+            className={number === page ? "page-num-btn active" : "page-num-btn"}
             onClick={function () {
               onPageChange(number);
             }}
@@ -30,15 +39,17 @@ function Pagination({ page, total, limit, onPageChange }) {
           </button>
         );
       })}
+
       <button
         type="button"
-        className="page-btn"
+        className="page-nav-btn"
         disabled={page >= pageCount}
         onClick={function () {
           onPageChange(page + 1);
         }}
+        aria-label="Next page"
       >
-        Next
+        ›
       </button>
     </nav>
   );

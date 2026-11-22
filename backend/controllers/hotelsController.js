@@ -74,8 +74,17 @@ async function getHotels(req, res) {
     values.push(limit);
     values.push(offset);
 
+    let orderSql = " ORDER BY id DESC";
+    if (req.query.sort === "price_asc") {
+      orderSql = " ORDER BY price ASC, id DESC";
+    } else if (req.query.sort === "price_desc") {
+      orderSql = " ORDER BY price DESC, id DESC";
+    } else if (req.query.sort === "oldest") {
+      orderSql = " ORDER BY id ASC";
+    }
+
     const listResult = await pool.query(
-      "SELECT * FROM hotels" + whereSql + " ORDER BY id DESC LIMIT $" + (values.length - 1) + " OFFSET $" + values.length,
+      "SELECT * FROM hotels" + whereSql + orderSql + " LIMIT $" + (values.length - 1) + " OFFSET $" + values.length,
       values
     );
 

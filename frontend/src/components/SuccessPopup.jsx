@@ -5,15 +5,17 @@ function SuccessPopup({ message, onClose }) {
 
   return (
     <div className="popup-backdrop" role="dialog" aria-modal="true" aria-labelledby="success-title">
-      <div className="popup-card">
-        <p className="popup-icon" aria-hidden="true">
+      <div className="popup-card success-popup-card">
+        <div className="popup-success-icon" aria-hidden="true">
           ✓
-        </p>
-        <h2 id="success-title">Success</h2>
-        <p>{message}</p>
-        <button type="button" className="btn btn-primary" onClick={onClose}>
-          Continue
-        </button>
+        </div>
+        <h2 id="success-title" className="popup-title">Action Successful</h2>
+        <p className="popup-message">{message}</p>
+        <div className="popup-actions center-actions">
+          <button type="button" className="btn btn-primary btn-popup-continue" onClick={onClose} autoFocus>
+            Continue
+          </button>
+        </div>
       </div>
     </div>
   );

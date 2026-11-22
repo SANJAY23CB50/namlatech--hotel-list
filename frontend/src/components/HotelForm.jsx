@@ -43,20 +43,34 @@ function HotelForm({ initialHotel, serverErrors, saving, onSubmit, submitLabel }
   );
 
   function handleChange(event) {
-    const name = event.target.name;
-    const value = event.target.value;
-    setValues(function (current) {
-      return { ...current, [name]: value };
+    const { name, value } = event.target;
+    setValues(function (curr) {
+      return { ...curr, [name]: value };
     });
+    // Clear error for that field if present
+    if (errors[name]) {
+      setErrors(function (curr) {
+        const next = { ...curr };
+        delete next[name];
+        return next;
+      });
+    }
   }
 
-  function handleImage(event) {
+  function handleImageChange(event) {
     const file = event.target.files && event.target.files[0];
     if (!file) {
       return;
     }
     setImageFile(file);
     setPreview(URL.createObjectURL(file));
+    if (errors.image) {
+      setErrors(function (curr) {
+        const next = { ...curr };
+        delete next.image;
+        return next;
+      });
+    }
   }
 
   function handleSubmit(event) {
@@ -80,58 +94,141 @@ function HotelForm({ initialHotel, serverErrors, saving, onSubmit, submitLabel }
   }
 
   return (
-    <form className="hotel-form" onSubmit={handleSubmit} noValidate>
-      <label className="image-field">
-        <span>Hotel image</span>
-        <input type="file" accept="image/png,image/jpeg,image/webp" onChange={handleImage} />
-        {preview ? (
-          <img src={preview} alt={values.title ? values.title + " preview" : "Hotel image preview"} />
-        ) : (
-          <div className="image-placeholder">Choose a photo to preview it here</div>
-        )}
-        {errors.image ? <small className="field-error">{errors.image}</small> : null}
-      </label>
-
-      <label>
-        <span>Hotel title</span>
-        <input name="title" value={values.title} onChange={handleChange} placeholder="Oceanview Inn" />
-        {errors.title ? <small className="field-error">{errors.title}</small> : null}
-      </label>
-
-      <label>
-        <span>Description</span>
-        <textarea
-          name="description"
-          rows="5"
-          value={values.description}
-          onChange={handleChange}
-          placeholder="Describe the stay, rooms, and nearby attractions."
-        />
-        {errors.description ? <small className="field-error">{errors.description}</small> : null}
-      </label>
-
-      <div className="form-row">
-        <label>
-          <span>Latitude</span>
-          <input name="latitude" value={values.latitude} onChange={handleChange} placeholder="12.9716" />
-          {errors.latitude ? <small className="field-error">{errors.latitude}</small> : null}
+    <form className="hotel-form-card" onSubmit={handleSubmit} noValidate>
+      {/* 1. Image Upload with Live Preview */}
+      <div className="form-group image-upload-group">
+        <label className="form-label" htmlFor="hotel-image-upload">
+          Hotel Image <span className="req-star">*</span>
+          <span className="field-hint"> (JPG, PNG or WEBP, max 5MB)</span>
         </label>
-        <label>
-          <span>Longitude</span>
-          <input name="longitude" value={values.longitude} onChange={handleChange} placeholder="77.5946" />
-          {errors.longitude ? <small className="field-error">{errors.longitude}</small> : null}
-        </label>
+        <div className="upload-dropzone">
+          <input
+            id="hotel-image-upload"
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/jpg"
+            onChange={handleImageChange}
+            className="file-input"
+          />
+          {preview ? (
+            <div className="preview-container">
+              <img
+                src={preview}
+                alt={values.title ? `${values.title} preview` : "Selected hotel preview"}
+                className="image-preview"
+              />
+              <span className="preview-badge">Preview</span>
+            </div>
+          ) : (
+            <div className="upload-placeholder">
+              <span className="upload-icon">📷</span>
+              <p>Click here to choose a photo for the hotel</p>
+            </div>
+          )}
+        </div>
+        {errors.image ? <p className="field-error-text">{errors.image}</p> : null}
       </div>
 
-      <label>
-        <span>Price per night</span>
-        <input name="price" type="number" min="1" step="0.01" value={values.price} onChange={handleChange} placeholder="3500" />
-        {errors.price ? <small className="field-error">{errors.price}</small> : null}
-      </label>
+      {/* 2. Hotel Title */}
+      <div className="form-group">
+        <label className="form-label" htmlFor="hotel-title-input">
+          Hotel Name / Title <span className="req-star">*</span>
+        </label>
+        <input
+          id="hotel-title-input"
+          name="title"
+          type="text"
+          value={values.title}
+          onChange={handleChange}
+          placeholder="e.g. The Grand Palace Hotel"
+          className={errors.title ? "form-input input-error" : "form-input"}
+          maxLength="150"
+        />
+        {errors.title ? <p className="field-error-text">{errors.title}</p> : null}
+      </div>
 
-      <button type="submit" className="btn btn-primary" disabled={saving}>
-        {saving ? "Saving..." : submitLabel}
-      </button>
+      {/* 3. Description */}
+      <div className="form-group">
+        <label className="form-label" htmlFor="hotel-description-input">
+          Description <span className="req-star">*</span>
+        </label>
+        <textarea
+          id="hotel-description-input"
+          name="description"
+          rows="4"
+          value={values.description}
+          onChange={handleChange}
+          placeholder="Describe the ambiance, rooms, key amenities, and nearby attractions..."
+          className={errors.description ? "form-textarea input-error" : "form-textarea"}
+          maxLength="2000"
+        />
+        <div className="char-counter">{values.description.length} / 2000 chars</div>
+        {errors.description ? <p className="field-error-text">{errors.description}</p> : null}
+      </div>
+
+      {/* 4. Latitude and Longitude */}
+      <div className="form-row-2col">
+        <div className="form-group">
+          <label className="form-label" htmlFor="hotel-lat-input">
+            Latitude <span className="req-star">*</span>
+            <span className="field-hint"> (-90 to 90)</span>
+          </label>
+          <input
+            id="hotel-lat-input"
+            name="latitude"
+            type="number"
+            step="any"
+            value={values.latitude}
+            onChange={handleChange}
+            placeholder="e.g. 18.921984"
+            className={errors.latitude ? "form-input input-error" : "form-input"}
+          />
+          {errors.latitude ? <p className="field-error-text">{errors.latitude}</p> : null}
+        </div>
+
+        <div className="form-group">
+          <label className="form-label" htmlFor="hotel-lng-input">
+            Longitude <span className="req-star">*</span>
+            <span className="field-hint"> (-180 to 180)</span>
+          </label>
+          <input
+            id="hotel-lng-input"
+            name="longitude"
+            type="number"
+            step="any"
+            value={values.longitude}
+            onChange={handleChange}
+            placeholder="e.g. 72.833183"
+            className={errors.longitude ? "form-input input-error" : "form-input"}
+          />
+          {errors.longitude ? <p className="field-error-text">{errors.longitude}</p> : null}
+        </div>
+      </div>
+
+      {/* 5. Price */}
+      <div className="form-group">
+        <label className="form-label" htmlFor="hotel-price-input">
+          Price per Night (₹) <span className="req-star">*</span>
+        </label>
+        <input
+          id="hotel-price-input"
+          name="price"
+          type="number"
+          min="1"
+          step="0.01"
+          value={values.price}
+          onChange={handleChange}
+          placeholder="e.g. 4500"
+          className={errors.price ? "form-input input-error" : "form-input"}
+        />
+        {errors.price ? <p className="field-error-text">{errors.price}</p> : null}
+      </div>
+
+      {/* Submit Button */}
+      <div className="form-actions-bar">
+        <button type="submit" className="btn-submit-hotel" disabled={saving}>
+          {saving ? "Saving..." : submitLabel}
+        </button>
+      </div>
     </form>
   );
 }
