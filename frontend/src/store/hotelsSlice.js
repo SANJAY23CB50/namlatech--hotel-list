@@ -49,7 +49,6 @@ const initialState = {
   minPrice: "",
   maxPrice: "",
   sort: "newest",
-  minRating: 0,
   current: null,
   loading: false,
   saving: false,
@@ -74,9 +73,6 @@ const hotelsSlice = createSlice({
     setSort: function (state, action) {
       state.sort = action.payload;
     },
-    setMinRating: function (state, action) {
-      state.minRating = action.payload;
-    },
     setPage: function (state, action) {
       state.page = action.payload;
     },
@@ -85,7 +81,6 @@ const hotelsSlice = createSlice({
       state.minPrice = "";
       state.maxPrice = "";
       state.sort = "newest";
-      state.minRating = 0;
       state.page = 1;
     },
     clearSuccess: function (state) {
@@ -160,7 +155,6 @@ export const {
   setMinPrice,
   setMaxPrice,
   setSort,
-  setMinRating,
   setPage,
   resetFilters,
   clearSuccess,

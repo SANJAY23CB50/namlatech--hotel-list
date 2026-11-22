@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +13,6 @@ import {
   resetFilters,
   setMaxPrice,
   setMinPrice,
-  setMinRating,
   setPage,
   setSearchTitle,
   setSort
@@ -22,6 +21,8 @@ import {
 function HotelListPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const resultsTopRef = useRef(null);
+
   const {
     items,
     total,
@@ -31,7 +32,6 @@ function HotelListPage() {
     minPrice,
     maxPrice,
     sort,
-    minRating,
     loading,
     error,
     successMessage
@@ -52,11 +52,14 @@ function HotelListPage() {
     [dispatch, page, sort]
   );
 
+  // Synchronize local filter inputs when Redux state changes (e.g. on reset or header search)
   useEffect(
     function () {
       setLocalTitle(searchTitle);
+      setLocalMin(minPrice);
+      setLocalMax(maxPrice);
     },
-    [searchTitle]
+    [searchTitle, minPrice, maxPrice]
   );
 
   function handleApplyFilters(e) {
@@ -83,7 +86,10 @@ function HotelListPage() {
 
   function handlePageChange(nextPage) {
     dispatch(setPage(nextPage));
-    window.scrollTo({ top: 120, behavior: "smooth" });
+    // Scroll to the beginning of the hotel list after changing pages
+    if (resultsTopRef.current) {
+      resultsTopRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   function handleDeleteConfirm() {
@@ -95,15 +101,6 @@ function HotelListPage() {
     });
     setHotelToDelete(null);
   }
-
-  // Filter items by client-side rating if rating selected
-  const displayedItems = minRating > 0
-    ? items.filter(function (h) {
-        const ratingsMap = [4.8, 4.6, 4.9, 4.5, 4.7, 4.3, 4.6, 4.4];
-        const r = ratingsMap[Math.abs(Number(h.id) || 1) % ratingsMap.length];
-        return r >= minRating;
-      })
-    : items;
 
   return (
     <main className="page list-page">
@@ -182,55 +179,6 @@ function HotelListPage() {
               </button>
             </div>
 
-            {/* Ratings Filter Section */}
-            <div className="filter-section">
-              <h3 className="filter-title">Star Ratings</h3>
-              <div className="ratings-list">
-                {[
-                  { stars: 4.8, label: "★★★★★ 4.8 & above" },
-                  { stars: 4.5, label: "★★★★☆ 4.5 & above" },
-                  { stars: 4.0, label: "★★★★☆ 4.0 & above" }
-                ].map(function (opt) {
-                  return (
-                    <label key={opt.stars} className="rating-checkbox-row">
-                      <input
-                        type="radio"
-                        name="rating-filter"
-                        checked={minRating === opt.stars}
-                        onChange={function () {
-                          dispatch(setMinRating(minRating === opt.stars ? 0 : opt.stars));
-                        }}
-                      />
-                      <span className="rating-check-label">{opt.label}</span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Popular Amenities Section */}
-            <div className="filter-section">
-              <h3 className="filter-title">Amenities Included</h3>
-              <div className="amenities-list">
-                <label className="checkbox-row">
-                  <input type="checkbox" defaultChecked />
-                  <span>Free High-speed Wi-Fi</span>
-                </label>
-                <label className="checkbox-row">
-                  <input type="checkbox" defaultChecked />
-                  <span>Free Cancellation</span>
-                </label>
-                <label className="checkbox-row">
-                  <input type="checkbox" />
-                  <span>Swimming Pool</span>
-                </label>
-                <label className="checkbox-row">
-                  <input type="checkbox" />
-                  <span>Breakfast Included</span>
-                </label>
-              </div>
-            </div>
-
             {/* Reset Filters Button */}
             <button
               type="button"
@@ -243,7 +191,7 @@ function HotelListPage() {
         </aside>
 
         {/* Right Column: Hotel Listings & Pagination */}
-        <section className="content-area" aria-label="Hotel search results">
+        <section className="content-area" ref={resultsTopRef} aria-label="Hotel search results">
           {/* Results Topbar matching sample UI */}
           <div className="results-topbar">
             <div className="results-count">
@@ -282,7 +230,7 @@ function HotelListPage() {
           ) : null}
 
           {/* Cards List or Empty State */}
-          {!loading && displayedItems.length === 0 ? (
+          {!loading && items.length === 0 ? (
             <div className="empty-state-box">
               <div className="empty-icon">🏨</div>
               <h2>No hotels found</h2>
@@ -298,7 +246,7 @@ function HotelListPage() {
             </div>
           ) : (
             <div className="hotel-items-list" aria-live="polite">
-              {displayedItems.map(function (hotel) {
+              {items.map(function (hotel) {
                 return (
                   <HotelCard
                     key={hotel.id}

@@ -142,11 +142,6 @@ function HotelDetailPage() {
           </div>
 
           <div className="detail-info">
-            <div className="detail-badge-row">
-              <span className="badge-luxury">Verified Stay</span>
-              <span className="badge-free-cancel">Free cancellation available</span>
-            </div>
-
             <h1 className="detail-title">{current.title}</h1>
 
             <div className="detail-price-line">

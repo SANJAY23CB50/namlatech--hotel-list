@@ -1383,19 +1383,20 @@ select {
   margin-top: 40px;
 }
 
-.footer-content {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.8fr;
-  gap: 32px;
-  padding: 40px 16px;
+.footer-content-simple {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 16px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
 .footer-brand {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 18px;
-  margin-bottom: 12px;
+  font-size: 16px;
 }
 
 .brand-badge {
@@ -1407,91 +1408,26 @@ select {
   border-radius: var(--radius-sm);
 }
 
-.copyright-text {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 8px;
-}
-
-.footer-desc {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.5;
-}
-
-.footer-col h4 {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  margin-bottom: 14px;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.footer-col ul {
-  list-style: none;
+.footer-nav-links {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  gap: 20px;
 }
 
-.footer-col ul a {
-  color: rgba(255, 255, 255, 0.75);
+.footer-nav-links a {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
   font-size: 13px;
   transition: color 0.15s;
 }
 
-.footer-col ul a:hover {
+.footer-nav-links a:hover {
   color: #ffffff;
+  text-decoration: underline;
 }
 
-.newsletter-col p {
-  font-size: 12.5px;
+.copyright-text {
+  font-size: 13px;
   color: rgba(255, 255, 255, 0.75);
-  line-height: 1.5;
-  margin-bottom: 12px;
-}
-
-.newsletter-form {
-  display: flex;
-}
-
-.newsletter-form input {
-  flex: 1;
-  border: none;
-  padding: 9px 12px;
-  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-  outline: none;
-}
-
-.btn-join {
-  background: var(--primary);
-  color: #ffffff;
-  border: none;
-  padding: 0 16px;
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.5px;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.btn-join:hover {
-  background: #1976d2;
-}
-
-.footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 14px 0;
-}
-
-.footer-bottom-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
 }
 
 /* ==========================================================================
@@ -1512,12 +1448,12 @@ select {
     grid-column: span 2;
   }
 
-  .detail-card {
-    grid-template-columns: 1fr;
+  .horizontal-card {
+    grid-template-columns: 210px 1fr 170px;
   }
 
-  .footer-content {
-    grid-template-columns: 1fr 1fr;
+  .detail-card {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1563,7 +1499,9 @@ select {
     grid-template-columns: 1fr;
   }
 
-  .footer-content {
-    grid-template-columns: 1fr;
+  .footer-content-simple {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
   }
 }

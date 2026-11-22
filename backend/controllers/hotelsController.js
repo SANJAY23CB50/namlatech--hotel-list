@@ -33,6 +33,7 @@ async function createHotel(req, res) {
       hotel: result.rows[0]
     });
   } catch (error) {
+    console.error("createHotel error:", error);
     if (req.file) {
       fs.unlink(req.file.path, function () {});
     }
@@ -144,6 +145,7 @@ async function updateHotel(req, res) {
       hotel: result.rows[0]
     });
   } catch (error) {
+    console.error("createHotel error:", error);
     if (req.file) {
       fs.unlink(req.file.path, function () {});
     }

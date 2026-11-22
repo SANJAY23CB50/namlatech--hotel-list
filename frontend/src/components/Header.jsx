@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loadHotels, setPage, setSearchTitle } from "../store/hotelsSlice";
@@ -11,6 +11,13 @@ function Header() {
     return state.hotels.searchTitle;
   });
   const [localSearch, setLocalSearch] = useState(searchTitle);
+
+  useEffect(
+    function () {
+      setLocalSearch(searchTitle);
+    },
+    [searchTitle]
+  );
 
   function handleSearchSubmit(e) {
     e.preventDefault();
