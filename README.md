@@ -1,50 +1,62 @@
-# NamlaTech - StayFind (Hotel List Manager)
 
+# Hotel Management System
 
+A full-stack Hotel Management application built using React.js, Node.js, Express.js and PostgreSQL.
 
-namlatech assignment -hotel/
-├── backend/
-│   ├── controllers/
-│   │   └── hotelsController.js    # CRUD handlers & Native SQL queries
-│   ├── middleware/
-│   │   ├── upload.js              # Multer configuration (5MB limit, disk storage)
-│   │   └── validateHotel.js       # Field-level validation & temp file cleanup
-│   ├── routes/
-│   │   └── hotels.js              # REST endpoints definition
-│   ├── uploads/                   # Stored hotel images (served at /uploads)
-│   ├── db.js                      # PostgreSQL pool configuration
-│   ├── schema.sql                 # Native PostgreSQL table schema
-│   ├── seed.js                    # Seeder with 8 sample hotels & downloaded images
-│   ├── server.js                  # Express server entry point
-│   ├── .env                       # Database credentials
-│   └── package.json
-├── frontend/
-│   ├── src/
-│   │   ├── api/
-│   │   │   └── hotelsApi.js       # API fetch wrapper
-│   │   ├── components/
-│   │   │   ├── ConfirmDialog.jsx  # Accessible delete confirmation modal
-│   │   │   ├── Footer.jsx         # NamlaTech sample UI footer
-│   │   │   ├── Header.jsx         # Top navbar, search bar & hero breadcrumb banner
-│   │   │   ├── HotelCard.jsx      # Horizontal card layout matching sample UI
-│   │   │   ├── HotelForm.jsx      # Reusable Add/Edit form with live image preview
-│   │   │   ├── Pagination.jsx     # Centered pagination component
-│   │   │   └── SuccessPopup.jsx   # Success notification modal
-│   │   ├── pages/
-│   │   │   ├── HotelDetailPage.jsx# Full details, OpenStreetMap & Geolocation distance
-│   │   │   ├── HotelFormPage.jsx  # Container page for Add/Edit
-│   │   │   └── HotelListPage.jsx  # Sidebar filters, results topbar, cards & pagination
-│   │   ├── store/
-│   │   │   ├── hotelsSlice.js     # Redux Toolkit slice & async thunks
-│   │   │   └── index.js           # Redux store
-│   │   ├── styles/
-│   │   │   └── index.css          # Design system matching NamlaTech sample UI
-│   │   ├── utils/
-│   │   │   └── validation.js      # Form validation & Haversine formula
-│   │   ├── App.jsx                # SPA routes
-│   │   └── main.jsx               # Entry point
-│   ├── vite.config.js             # Vite configuration with proxy to backend (5000)
-│   └── package.json
-└── README.md
+## Features
+
+- Add new hotels with image upload.
+- Edit and delete hotel details.
+- View hotel details with map.
+- Search hotels by title.
+- Filter hotels by price range.
+- Pagination for hotel listings.
+- Form validation and image preview.
+- REST API integration with PostgreSQL.
+
+## Tech Stack
+
+**Frontend:** React.js, Redux Toolkit, JavaScript, HTML, CSS
+
+**Backend:** Node.js, Express.js
+
+**Database:** PostgreSQL
+
+**Tools:** Vite, Git, GitHub, Postman
+
+## Project Setup
+
+### 1. Clone the repository
+
+```bash
+git clone YOUR_GITHUB_REPOSITORY_URL
 ```
 
+### 2. Start the backend
+
+```bash
+cd backend
+npm install
+```
+
+Configure your `.env` file with your PostgreSQL credentials.
+
+```bash
+npm run dev
+```
+
+### 3. Start the frontend
+
+Open another terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## Application URLs
+
+- Frontend: http://localhost:5173
+- Backend: http://localhost:5000
+- API: http://localhost:5000/api/hotels
