@@ -29,7 +29,7 @@ A full-stack Hotel Management application built using React.js, Node.js, Express
 ### 1. Clone the repository
 
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
+https://github.com/SANJAY23CB50/namlatech--hotel-list.git
 ```
 
 ### 2. Start the backend
