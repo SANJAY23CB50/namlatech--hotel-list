@@ -1,75 +1,7 @@
 # NamlaTech - StayFind (Hotel List Manager)
 
-A full-stack Single Page Application (SPA) built for the **NamlaTech Hotel List Page** coding assignment. Designed to match the provided NamlaTech sample UI specifications with a clean, responsive layout.
 
----
 
-## 🚀 Technology Stack
-
-### Frontend
-- **ReactJS (v19)** Single Page Application (SPA)
-- **Redux Toolkit & React-Redux** for centralized state management
-- **React Router DOM (v7)** for client-side routing
-- **React Helmet Async** for dynamic SEO meta tags
-- **Pure Custom HTML5 & CSS3** matching the NamlaTech sample UI design system (no external UI component libraries)
-- **HTML5 Geolocation API & OpenStreetMap** for live distance calculation and interactive maps
-
-### Backend
-- **Node.js & Express (v5)** REST API
-- **PostgreSQL (`pg` pool)** with **Native SQL queries** (no ORM)
-- **Multer** for local server storage of hotel images (`backend/uploads/`) with type & size validation
-
----
-
-## 📋 Features Checklist (Fulfilling All Assignment Requirements)
-
-### 1. Add / Edit Form (`/hotels/new` & `/hotels/:id/edit`)
-- **Single Reusable Form Component** (`HotelForm.jsx`): Used for both adding and editing hotels.
-- **Fields with Validation**:
-  - **Image Upload**: File input supporting JPEG, PNG, WEBP (up to 5MB) with **instant live image preview**.
-  - **Title**: Hotel name input (3–150 characters).
-  - **Description**: Textarea for hotel details (10–2000 characters) with real-time character count.
-  - **Latitude & Longitude**: Precise geographic coordinate inputs (-90° to 90°, -180° to 180°).
-  - **Price**: Numeric input with validation (must be > 0).
-- **Client & Server-Side Validation**: Immediate feedback on form inputs and error recovery.
-
-### 2. Hotel List Page with Pagination (`/`)
-- **Responsive List Layout (Not a Table)**:
-  - Designed as **horizontal item cards** matching the NamlaTech sample UI layout.
-  - Each card displays the hotel image (with descriptive SEO `alt` tag), title, star rating, price per night, coordinates, feature badges, and description snippet.
-- **Search & Filters**:
-  - **Search by Title**: Case-insensitive partial matching (Native SQL `ILIKE`).
-  - **Filter by Price Range**: Min Price and Max Price inputs with dedicated **"APPLY"** button.
-  - **Sort Controls**: Sort by Best Match, Price: Low to High, Price: High to Low, or Oldest.
-  - **Star Rating Filter**: Quick-filter stays by star ratings (4.8+, 4.5+, 4.0+).
-- **Server-Side Pagination**:
-  - Paginated display with page navigation (`‹ 1 2 3 ›`).
-- **Edit & Delete Actions**:
-  - Edit button navigates directly to pre-populated edit form.
-  - Delete button triggers an accessible **ConfirmDialog** modal.
-  - Shows an animated **Success Popup** notification upon successful deletion.
-
-### 3. Hotel Detail Page (`/hotels/:id`)
-- Displays hotel photography, full description, verified badge, coordinates, and pricing.
-- **Interactive Map**: Embedded OpenStreetMap centered on the hotel's latitude and longitude with pin marker.
-- **Geolocation API Integration**: Reads user's current GPS location and calculates straight-line distance to the hotel in kilometers using the Haversine formula.
-
-### 4. SEO & Accessibility Optimization
-- **React Helmet (`react-helmet-async`)**: Dynamic `<title>`, `<meta name="description">`, and OpenGraph tags per page.
-- **Accessible Images**: All `<img>` elements include meaningful `alt` text.
-
-### 5. Backend REST API Endpoints
-- `POST /api/hotels`: Create hotel with image upload and field validation (stores image in `backend/uploads/` and path in DB).
-- `PUT /api/hotels/:id`: Update hotel details and optionally update hotel image (removes old image file from disk).
-- `DELETE /api/hotels/:id`: Delete hotel record and clean up image file from server.
-- `GET /api/hotels`: List hotels with `title`, `minPrice`, `maxPrice`, `sort`, `offset`, and `limit` native SQL parameters.
-- `GET /api/hotels/:id`: Fetch single hotel by ID.
-
----
-
-## 🛠️ Project Structure
-
-```
 namlatech assignment -hotel/
 ├── backend/
 │   ├── controllers/
@@ -116,39 +48,3 @@ namlatech assignment -hotel/
 └── README.md
 ```
 
----
-
-## ⚡ Quick Start Guide
-
-### 1. Database Setup
-Ensure PostgreSQL is running. Configure credentials in `backend/.env`:
-```env
-PORT=5000
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=hotel_db
-DB_USER=postgres
-DB_PASSWORD=your_password
-```
-
-### 2. Seed Initial Hotel Data
-Populate the database with 8 authentic hotel listings and download sample images to `backend/uploads/`:
-```bash
-cd backend
-npm run seed
-```
-
-### 3. Start Backend Server
-```bash
-cd backend
-npm run dev
-# Server running on http://localhost:5000
-```
-
-### 4. Start Frontend
-```bash
-cd frontend
-npm run dev
-# App running on http://localhost:5173
-```
-Open [http://localhost:5173](http://localhost:5173) in your browser.

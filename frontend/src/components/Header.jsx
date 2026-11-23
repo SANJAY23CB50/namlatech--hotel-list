@@ -48,7 +48,7 @@ function Header() {
       {/* Top Navbar */}
       <div className="top-nav">
         <div className="container top-nav-inner">
-          <Link to="/" className="brand" aria-label="NamlaTech StayFind Home">
+          <Link to="/" className="brand" aria-label="NamlaTech ">
             <span className="brand-logo-badge">NT</span>
             <div className="brand-text">
               <strong className="brand-title">NamlaTech <span className="brand-sub">StayFind</span></strong>

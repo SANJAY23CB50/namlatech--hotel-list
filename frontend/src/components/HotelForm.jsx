@@ -76,6 +76,7 @@ function HotelForm({ initialHotel, serverErrors, saving, onSubmit, submitLabel }
   function handleSubmit(event) {
     event.preventDefault();
     const nextErrors = validateHotelForm(values, imageFile, Boolean(initialHotel));
+  
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
       return;
